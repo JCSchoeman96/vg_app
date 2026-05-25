@@ -1,7 +1,7 @@
 # AGENTS.md
 
-> Agent operating law for this repository.  
-> This file is authority for coding agents, review agents, and planning agents.
+> Operating law for `vg_app` coding agents, review agents, and planning agents.
+> Keep this file short, strict, and executable.
 
 ---
 
@@ -16,7 +16,7 @@ Code = implementation
 PR = review boundary
 ```
 
-Agents SHALL implement only the active slice or tracer bullet assigned.
+Agents SHALL implement only the assigned tracer bullet or vertical slice.
 Agents SHALL NOT implement deferred resources, future slices, or speculative abstractions.
 Agents SHALL stop and report gaps instead of inventing missing business rules.
 
@@ -25,6 +25,7 @@ Agents SHALL stop and report gaps instead of inventing missing business rules.
 ## 1. Stack
 
 ```text
+App name       |> vg_app
 Language       |> Elixir
 Framework      |> Phoenix
 Domain         |> Ash 3.x
@@ -36,32 +37,33 @@ UI             |> DaisyUI
 Components     |> Mishka Chelekom
 IDs            |> UUIDv7
 Timestamps     |> UTC microsecond precision
+Tool runner    |> mise
+GitHub         |> gh CLI
 ```
 
-All new code SHALL respect this stack unless the planning pack explicitly overrides it.
+All new code SHALL respect this stack unless the active planning pack explicitly overrides it.
 
 ---
 
 ## 2. End Goal
 
 ```text
-Build a controlled membership-commerce platform
-|> multi-product membership foundation
+vg_app
+|> controlled membership-commerce foundation
+|> multi-product memberships
 |> Paystack-first payment verification
 |> entitlement-based access
 |> future auto-renewing subscriptions
-|> expandable Phoenix/Ash architecture
-|> no scope creep
+|> Phoenix/Ash architecture
 |> no hidden business logic
+|> no scope creep
 ```
 
-The platform SHALL grow by locked tracer bullets and vertical slices only.
+The platform SHALL grow through locked tracer bullets and vertical slices only.
 
 ---
 
 ## 3. Assertion Language
-
-Use these words precisely:
 
 ```text
 SHALL      |> mandatory implementation rule
@@ -69,11 +71,11 @@ MUST       |> mandatory process/safety rule
 MUST NOT   |> forbidden action
 MAY        |> allowed, not required
 SHOULD     |> recommended default
-DEFERRED   |> documented but not implementable now
+DEFERRED   |> documented, not implementable now
 BLOCKED    |> cannot proceed until resolved
 ```
 
-Agents MUST preserve assertion language in docs, comments, tests, and PR notes.
+Agents MUST preserve assertion language in docs, tests, PR notes, and review comments.
 
 ---
 
@@ -96,14 +98,12 @@ latest planning baseline
 |> repeat
 ```
 
-Agents MUST NOT build the whole baseline at once.
+Agents MUST NOT build the full baseline at once.
 Agents MUST NOT build frontend before backend rules and tests exist unless the slice explicitly requires it.
 
 ---
 
 ## 5. Tracer Bullets and Vertical Slices
-
-### Tracer Bullet
 
 ```text
 Tracer Bullet
@@ -113,17 +113,13 @@ Tracer Bullet
 |> does not require polished UI
 ```
 
-### Vertical Slice
-
 ```text
 Vertical Slice
-|> delivers a user/business capability
+|> delivers one user/business capability
 |> includes only required backend + UI + tests
-|> must be independently reviewable
+|> is independently reviewable
 |> must not absorb future features
 ```
-
-### Rule
 
 ```text
 Future capability
@@ -134,22 +130,124 @@ Future capability
 
 ---
 
-## 6. Repo Rules
+## 6. Repo Automation Authority
+
+Agents SHALL use repo automation before ad-hoc commands.
 
 ```text
-git status       |> check before work
-git branch       |> confirm branch before work
-git worktree     |> inspect when relevant
-gh CLI           |> available and SHALL be used for PRs
-meaningful work  |> SHALL end with a PR
+Makefile          |> primary command surface
+scripts/          |> repeatable repo operations
+.githooks/        |> local Git hooks
+.tool-versions    |> pinned runtime/tooling versions
+mix.exs           |> Elixir dependencies/tasks
+assets/package.*  |> frontend dependencies
 ```
+
+Required files:
+
+```text
+Makefile
+scripts/check_repo_state.sh
+scripts/create_pr.sh
+scripts/dev_postgres.sh
+scripts/install_git_hooks.sh
+scripts/precommit.sh
+scripts/sync_with_origin_main.sh
+.githooks/pre-commit
+```
+
+Scripts SHALL be executable.
+Agents SHALL NOT bypass existing Makefile targets or scripts unless the target is broken and the failure is reported.
+
+---
+
+## 7. Makefile Law
+
+Default target SHALL be safe:
+
+```text
+make             |> help only
+```
+
+Canonical targets:
+
+```text
+make status          |> git branch/status/worktrees
+make doctor          |> required local tool check
+make sync-check      |> safe Git sync check
+make sync            |> safe origin/main sync
+make toolchain       |> mise install + BEAM verification
+make deps            |> Hex/Rebar/deps compile
+make hooks           |> install repo-local hooks
+make infra           |> start local Postgres
+make db              |> prepare dev database
+make db-test         |> prepare test database
+make setup           |> doctor + toolchain + deps + hooks + infra + dbs
+make ready           |> status + sync + setup + ci
+make ready-local     |> status + setup + ci, no git sync
+make check           |> format-check + compile + test
+make precommit       |> full local gate
+make ci              |> CI-equivalent local gate
+make pr              |> check/push/create PR through gh
+```
+
+Ash targets:
+
+```text
+make ash-codegen-dev
+make ash-codegen NAME=<meaningful_name>
+make ash-migrate
+```
+
+Database targets:
+
+```text
+make reset-db        |> destructive; requires script-level --yes
+make stop-db
+make logs-db
+make psql-db
+```
+
+Agents SHALL prefer:
+
+```text
+make status
+|> make doctor
+|> make sync-check
+|> work
+|> make check
+|> make precommit
+|> make pr
+```
+
+---
+
+## 8. Required Tools
+
+`make doctor` SHALL fail if required tools are missing.
+
+```text
+git        |> source control
+bash       |> scripts
+make       |> command orchestration
+mise       |> toolchain runner
+docker     |> local Postgres
+gh         |> PR creation
+rg         |> repository search
+ast-grep   |> structural search/refactor checks
+```
+
+`ast-grep` command MAY be available as `ast-grep` or `sg`.
+
+---
+
+## 9. Git and PR Rules
 
 Before edits:
 
-```bash
-git status --short
-git branch --show-current
-git worktree list
+```text
+make status
+|> make sync-check
 ```
 
 Branch naming:
@@ -161,193 +259,179 @@ fix/<short-description>
 chore/<short-description>
 ```
 
-PR rule:
+Meaningful work SHALL end with a PR:
 
 ```text
-Meaningful code/doc change
+make precommit
+|> git status --short --branch
 |> commit
-|> push branch
-|> gh pr create
-```
-
-Agents SHALL NOT commit secrets.
-Agents SHALL NOT rewrite history unless explicitly instructed.
-Agents SHALL NOT mix unrelated slices in one PR.
-
----
-
-## 7. Required Search and Analysis Tools
-
-Agents MUST use repository search before creating new code.
-
-```text
-rg / grep   |> required for text search
-ast-grep    |> required for structural code search/refactor checks
-mix xref    |> use for dependency/call checks when relevant
-```
-
-Required before adding a new function/module:
-
-```bash
-rg "existing_name|similar_term|domain_term" lib test config
-ast-grep --pattern '<pattern>' lib test
-```
-
-Rule:
-
-```text
-Existing function fits
-|> reuse it
-Existing function almost fits
-|> extend safely if slice allows
-No existing function fits
-|> create new function with tests
-```
-
-Agents MUST NOT create unnecessary duplicate helpers.
-
----
-
-## 8. Scripts and Mix Tasks From the Start
-
-The repo SHOULD include scripts and Mix tasks for repeatable checks.
-
-Required script intent:
-
-```text
-scripts/project_status.sh        |> git status, branch, worktrees, Elixir/Phoenix versions
-scripts/precommit.sh             |> full local quality gate
-scripts/ensure_clean_tree.sh     |> fail if unexpected dirty tree
-scripts/verify_planning_pack.sh  |> validate planning docs when present
-```
-
-Required Mix task intent:
-
-```text
-mix vgo.doctor          |> project health checks
-mix vgo.repo_status     |> repo state summary
-mix vgo.validate_plan   |> planning pack validation
-mix vgo.quality         |> compile + format + credo + tests + sobelow + dialyzer
-```
-
-If a script/task does not exist yet, the first relevant slice SHOULD add it.
-
----
-
-## 9. Makefile
-
-A `Makefile` SHALL exist and expose stable commands.
-
-Minimum targets:
-
-```makefile
-setup:
-status:
-doctor:
-compile:
-format:
-credo:
-dialyzer:
-sobelow:
-test:
-test-red:
-test-green:
-ash-codegen:
-precommit:
-ci:
-pr:
-```
-
-Canonical pipeline:
-
-```text
-make status
-|> make test-red
-|> implement
-|> make test-green
-|> make precommit
 |> make pr
 ```
 
-Agents SHALL prefer Make targets over ad-hoc commands once targets exist.
+`gh` CLI SHALL be used for PRs.
+
+Agents MUST NOT:
+
+```text
+commit secrets
+rewrite shared history without approval
+mix unrelated slices in one PR
+rebase a pushed/shared branch without approval
+continue during merge/rebase/cherry-pick conflict state
+```
 
 ---
 
-## 10. Precommit Gate
+## 10. Search Before Code
 
-`precommit` SHALL always run before PR.
-
-Minimum gate:
+Agents MUST search before creating modules, functions, helpers, policies, or tests.
 
 ```text
-mix deps.unlock --check-unused
+rg / grep   |> text search
+ast-grep    |> structural code search
+mix xref    |> dependency/call checks when relevant
+```
+
+Minimum before new function/module:
+
+```bash
+rg "domain_term|similar_name|existing_name" lib test config
+ast-grep --pattern '<pattern>' lib test || true
+```
+
+Reuse law:
+
+```text
+existing function fits
+|> reuse it
+existing function almost fits
+|> extend safely if slice allows
+no existing function fits
+|> create new function with RED tests
+```
+
+Agents MUST NOT create duplicate helpers when existing code can be reused safely.
+
+---
+
+## 11. Local Postgres Law
+
+Local Postgres automation SHALL use `scripts/dev_postgres.sh` through Makefile targets.
+
+```text
+container |> vg_app-postgres-dev
+volume    |> vg_app-postgres-dev-data
+database  |> vg_app_dev
+image     |> postgres:16-alpine
+host port |> 5433 by default
+```
+
+Use:
+
+```text
+make infra
+make db
+make db-test
+make reset-db
+make stop-db
+make logs-db
+make psql-db
+```
+
+Agents MUST NOT hardcode local Postgres assumptions in application code.
+Environment/config files SHALL define app DB connection details.
+
+---
+
+## 12. Precommit Gate
+
+`make precommit` SHALL run before PR.
+
+Current gate:
+
+```text
+mix format --check-formatted
 |> mix compile --warnings-as-errors
-|> mix format --check-formatted
 |> mix ash.codegen --check
-|> mix test
 |> mix credo --strict
 |> mix sobelow --config
+|> MIX_ENV=test mix test
 |> mix dialyzer
 ```
 
-If the project later uses `pre-commit`, the hook SHALL call the same gate.
+The gate is executed by:
 
-Agents MUST NOT skip a failing gate.
-Agents MUST report failures honestly with command output summary.
+```text
+scripts/precommit.sh
+.githooks/pre-commit
+```
+
+`ASH_CODEGEN_CHECK_CMD` MAY override the Ash codegen drift command if project convention changes.
+`SOBELOW_CMD` MAY override Sobelow config invocation if project convention changes.
+
+Agents MUST NOT weaken `scripts/precommit.sh` to make tests green.
+Agents MUST report gate failures honestly with command summaries.
 
 ---
 
-## 11. Test Law
+## 13. Test Law
 
 ```text
-RED test   |> write failing test first
-GREEN test |> implement minimum code to pass
-REFACTOR   |> only after green
+RED test
+|> write failing test first
+|> prove failure is meaningful
+
+GREEN test
+|> implement minimum correct code
+|> pass without weakening assertions
+
+REFACTOR
+|> only after GREEN
+|> keep tests GREEN
 ```
 
-Agents SHALL write tests for every meaningful behaviour change.
-Agents MUST NOT weaken, delete, skip, or rewrite tests merely to make the suite green.
-Agents MUST NOT replace a precise test with a weaker test.
-
-Allowed test changes:
-
-```text
-Test was wrong against planning law
-|> explain
-|> update with stronger/accurate assertion
-|> cite planning rule in PR
-```
+Agents SHALL write or update tests for every meaningful behaviour change.
 
 Forbidden:
 
 ```text
 skip test to pass
 remove assertion to pass
+rewrite precise test into vague test
 mock away core domain behaviour
 hide failure behind broad match
 ```
 
+Allowed only when planning law requires it:
+
+```text
+test was wrong
+|> explain why
+|> replace with stronger accurate assertion
+|> cite planning rule in PR
+```
+
 ---
 
-## 12. Ash / Domain Rules
+## 14. Ash / Domain Rules
 
 ```text
 Ash resource      |> domain truth boundary
 Ash action        |> explicit behaviour contract
-Policy            |> actor permission boundary
+Ash policy        |> actor permission boundary
 Changeset         |> validation/change boundary
 Oban job          |> async boundary only
 Phoenix LiveView  |> UI boundary only
+Controller        |> transport boundary only
 ```
 
-Agents SHALL NOT place domain truth in LiveView.
-Agents SHALL NOT place payment fulfilment truth in controllers.
-Agents SHALL NOT bypass Ash actions for domain mutations unless the planning pack explicitly allows it.
+Agents SHALL NOT place domain truth in LiveView/controllers.
+Agents SHALL NOT bypass Ash actions for domain mutations unless the active planning pack explicitly allows it.
 Agents SHALL use AshPostgres migrations/codegen according to project convention.
 
 ---
 
-## 13. Payment / Membership Safety
+## 15. Payment / Membership Safety
 
 ```text
 Paystack callback visit
@@ -362,19 +446,20 @@ Paystack webhook
 Contradiction
 |> payment_review
 |> block access
-|> require reconciliation path
+|> reconciliation required
 ```
 
 Agents SHALL NOT duplicate fulfilment logic between callback and webhook paths.
 Agents SHALL NOT activate access from unverified client-side data.
+Agents SHALL NOT implement auto-renewing subscriptions until active planning law exists.
 
 ---
 
-## 14. IDs and Time
+## 16. IDs and Time
 
 ```text
 Primary keys      |> UUIDv7
-Ordering aid      |> UUIDv7 lexicographic order MAY be secondary only
+UUID ordering     |> secondary technical ordering aid only
 Business order    |> explicit timestamp / sequence / provider metadata
 Timestamps        |> UTC microsecond precision
 Local time        |> presentation only unless domain rule says otherwise
@@ -385,35 +470,31 @@ Agents SHALL NOT store naive local timestamps for persisted domain facts.
 
 ---
 
-## 15. Docs, Specs, and Comments
+## 17. Docs, Specs, and Comments
 
-Every public module SHOULD include:
+Public modules SHOULD include:
 
 ```elixir
 @moduledoc
 ```
 
-Every public function SHOULD include:
+Public functions SHOULD include:
 
 ```elixir
 @doc
 @spec
 ```
 
-Private helpers SHOULD have clear names and tests through public behaviour.
-
 Comments SHALL explain why, not restate what.
 
 ```text
-Good comment |> explains invariant, trade-off, or domain rule
-Bad comment  |> repeats the function name in prose
+Good comment |> invariant, trade-off, domain rule
+Bad comment  |> repeats function name in prose
 ```
 
 ---
 
-## 16. Reuse Law
-
-Before creating new code:
+## 18. Reuse and Abstraction Law
 
 ```text
 search existing
@@ -424,12 +505,12 @@ search existing
 ```
 
 Agents MUST prefer small composable functions.
-Agents MUST NOT create helper modules as dumping grounds.
-Agents MUST NOT introduce abstractions for future features unless active slice requires them.
+Agents MUST NOT create helper dumping grounds.
+Agents MUST NOT introduce abstractions for future features unless the active slice requires them.
 
 ---
 
-## 17. PR Requirements
+## 19. PR Requirements
 
 Every PR SHALL include:
 
@@ -446,7 +527,7 @@ Known gaps / deferred items
 PR body template:
 
 ```markdown
-## Slice
+## Slice / Tracer Bullet
 
 ## Planning Baseline
 
@@ -463,15 +544,19 @@ PR body template:
 
 Use:
 
+```text
+make pr
+```
+
+or, only if the script is unavailable:
+
 ```bash
 gh pr create --fill
 ```
 
-Then edit the PR body if needed.
-
 ---
 
-## 18. Stop Conditions
+## 20. Stop Conditions
 
 Agents MUST stop and report when:
 
@@ -481,9 +566,10 @@ actor permission unclear
 state transition unclear
 resource/action card absent
 test expectation conflicts with planning pack
-security/payment implication unclear
+payment/security implication unclear
 required dependency/version unknown
 precommit gate fails after reasonable fix attempt
+repo automation target is broken
 ```
 
 Report format:
@@ -498,7 +584,7 @@ BLOCKED
 
 ---
 
-## 19. Forbidden Behaviour
+## 21. Forbidden Behaviour
 
 Agents MUST NOT:
 
@@ -512,24 +598,27 @@ mix unrelated slices
 hide failures
 bypass Ash domains
 put domain truth in UI
+ignore Makefile/scripts
 implement auto-renewing subscriptions before active planning law exists
 ```
 
 ---
 
-## 20. Default Execution Pattern
+## 22. Default Execution Pattern
 
 ```text
 read AGENTS.md
 |> read current planning pack
 |> identify assigned slice
-|> check repo status
+|> make status
+|> make doctor
+|> make sync-check
 |> search existing code with rg + ast-grep
 |> write RED tests
 |> implement minimum code
-|> run GREEN tests
-|> run full precommit
-|> create PR with gh
+|> make check
+|> make precommit
+|> commit
+|> make pr
 |> report exact status
 ```
-
