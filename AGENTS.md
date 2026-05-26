@@ -194,7 +194,7 @@ make precommit
 
 If a Makefile/script target is broken, report it. Do not silently bypass repo automation.
 
-## 10. Git and PR Rules
+## 10. Git and PR Rules (gh CLI is available and MUST be used)
 
 Branch names SHOULD follow:
 
