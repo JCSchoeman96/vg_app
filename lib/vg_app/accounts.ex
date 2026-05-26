@@ -22,66 +22,76 @@ defmodule VgApp.Accounts do
     terms_version = Map.get(attrs, :terms_consent_version)
     privacy_version = Map.get(attrs, :privacy_policy_consent_version)
     marketing_consent = Map.get(attrs, :marketing_consent)
+    marketing_version = Map.get(attrs, :marketing_consent_version)
 
-    Ash.transaction([VgApp.Accounts.User, VgApp.Accounts.UserProfile, VgApp.Accounts.ConsentRecord], fn ->
-      with {:ok, user} <-
-             Ash.create(
-               VgApp.Accounts.User,
-               %{
-                 email: email,
-                 password: password,
-                 password_confirmation: password_confirmation
-               },
-               action: :register_with_password
-             ),
-           {:ok, _profile} <-
-             Ash.create(
-               VgApp.Accounts.UserProfile,
-               %{
-                 user_id: user.id,
-                 first_name: first_name,
-                 last_name: last_name,
-                 phone_number: phone_number
-               },
-               action: :create
-             ),
-           {:ok, _terms} <-
-             Ash.create(
-               VgApp.Accounts.ConsentRecord,
-               %{
-                 user_id: user.id,
-                 consent_type: :terms,
-                 consent_version: terms_version,
-                 source: :registration_form,
-                 accepted_at: DateTime.utc_now()
-               },
-               action: :create
-             ),
-           {:ok, _privacy} <-
-             Ash.create(
-               VgApp.Accounts.ConsentRecord,
-               %{
-                 user_id: user.id,
-                 consent_type: :privacy_policy,
-                 consent_version: privacy_version,
-                 source: :registration_form,
-                 accepted_at: DateTime.utc_now()
-               },
-               action: :create
-             ),
-           {:ok, _maybe_marketing} <- maybe_create_marketing_consent(user, marketing_consent) do
-        user
-      end
-    end)
+    if marketing_consent == true and (not is_binary(marketing_version) or marketing_version == "") do
+      {:error, :marketing_consent_version_required}
+    else
+      Ash.transaction(
+        [VgApp.Accounts.User, VgApp.Accounts.UserProfile, VgApp.Accounts.ConsentRecord],
+        fn ->
+          with {:ok, user} <-
+                 Ash.create(
+                   VgApp.Accounts.User,
+                   %{
+                     email: email,
+                     password: password,
+                     password_confirmation: password_confirmation
+                   },
+                   action: :register_with_password
+                 ),
+               {:ok, _profile} <-
+                 Ash.create(
+                   VgApp.Accounts.UserProfile,
+                   %{
+                     user_id: user.id,
+                     first_name: first_name,
+                     last_name: last_name,
+                     phone_number: phone_number
+                   },
+                   action: :create
+                 ),
+               {:ok, _terms} <-
+                 Ash.create(
+                   VgApp.Accounts.ConsentRecord,
+                   %{
+                     user_id: user.id,
+                     consent_type: :terms,
+                     consent_version: terms_version,
+                     source: :registration_form,
+                     accepted_at: DateTime.utc_now()
+                   },
+                   action: :create
+                 ),
+               {:ok, _privacy} <-
+                 Ash.create(
+                   VgApp.Accounts.ConsentRecord,
+                   %{
+                     user_id: user.id,
+                     consent_type: :privacy_policy,
+                     consent_version: privacy_version,
+                     source: :registration_form,
+                     accepted_at: DateTime.utc_now()
+                   },
+                   action: :create
+                 ),
+               {:ok, _maybe_marketing} <-
+                 maybe_create_marketing_consent(user, marketing_consent, marketing_version) do
+            user
+          end
+        end
+      )
+    end
   end
 
-  defp maybe_create_marketing_consent(user, true) do
+  defp maybe_create_marketing_consent(user, true, marketing_version)
+       when is_binary(marketing_version) and marketing_version != "" do
     Ash.create(
       VgApp.Accounts.ConsentRecord,
       %{
         user_id: user.id,
         consent_type: :marketing,
-        consent_version: "v0",
+        consent_version: marketing_version,
         source: :registration_form,
         accepted_at: DateTime.utc_now()
       },
@@ -89,7 +99,7 @@ defmodule VgApp.Accounts do
     )
   end
 
-  defp maybe_create_marketing_consent(_user, _), do: {:ok, :not_applicable}
+  defp maybe_create_marketing_consent(_user, _, _), do: {:ok, :not_applicable}
 
   def bootstrap_staff_admin(user_id) do
     Ash.create(

@@ -2,7 +2,7 @@ defmodule VgApp.Accounts.RegisterUserTest do
   use VgApp.DataCase, async: true
 
   alias VgApp.Accounts
-  alias VgApp.Accounts.{AccountRole, ConsentRecord, UserProfile}
+  alias VgApp.Accounts.{AccountRole, ConsentRecord, User, UserProfile}
   require Ash.Query
 
   defp valid_registration_attrs(overrides \\ %{}) do
@@ -16,15 +16,21 @@ defmodule VgApp.Accounts.RegisterUserTest do
         phone_number: nil,
         terms_consent_version: "v1",
         privacy_policy_consent_version: "v1",
-        marketing_consent: nil
+        marketing_consent: nil,
+        marketing_consent_version: nil
       },
       overrides
     )
   end
 
   test "terms_and_privacy_consent_required" do
-    assert {:error, _} = Accounts.register_user(valid_registration_attrs(%{terms_consent_version: nil}))
-    assert {:error, _} = Accounts.register_user(valid_registration_attrs(%{privacy_policy_consent_version: nil}))
+    assert {:error, _} =
+             Accounts.register_user(valid_registration_attrs(%{terms_consent_version: nil}))
+
+    assert {:error, _} =
+             Accounts.register_user(
+               valid_registration_attrs(%{privacy_policy_consent_version: nil})
+             )
   end
 
   test "marketing_consent_optional_and_separate" do
@@ -36,10 +42,29 @@ defmodule VgApp.Accounts.RegisterUserTest do
     consents =
       ConsentRecord
       |> Ash.Query.filter(user_id: user.id, state: :accepted)
-      |> Ash.read!()
+      |> Ash.read!(actor: user)
       |> Enum.map(& &1.consent_type)
 
     assert Enum.sort(consents) == [:privacy_policy, :terms]
+  end
+
+  test "register_user_rolls_back_user_when_profile_creation_fails" do
+    email = "rollback@example.com"
+
+    assert {:error, _} =
+             Accounts.register_user(
+               valid_registration_attrs(%{
+                 email: email,
+                 first_name: nil
+               })
+             )
+
+    users =
+      User
+      |> Ash.Query.filter(email: email)
+      |> Ash.read!(authorize?: false)
+
+    assert users == []
   end
 
   test "registers_user_with_required_profile_and_consents" do
@@ -48,7 +73,7 @@ defmodule VgApp.Accounts.RegisterUserTest do
     profile =
       UserProfile
       |> Ash.Query.filter(user_id: user.id)
-      |> Ash.read_one!()
+      |> Ash.read_one!(actor: user)
 
     assert profile.first_name == "Test"
     assert profile.last_name == "User"
@@ -56,12 +81,12 @@ defmodule VgApp.Accounts.RegisterUserTest do
     terms =
       ConsentRecord
       |> Ash.Query.filter(user_id: user.id, consent_type: :terms)
-      |> Ash.read_one!()
+      |> Ash.read_one!(actor: user)
 
     privacy =
       ConsentRecord
       |> Ash.Query.filter(user_id: user.id, consent_type: :privacy_policy)
-      |> Ash.read_one!()
+      |> Ash.read_one!(actor: user)
 
     assert terms.consent_version == "v1"
     assert privacy.consent_version == "v1"
@@ -107,5 +132,37 @@ defmodule VgApp.Accounts.RegisterUserTest do
                role: :customer,
                granted_by_user_id: staff_admin_user.id
              })
+  end
+
+  test "marketing_consent_requires_version_when_true" do
+    assert {:error, :marketing_consent_version_required} =
+             Accounts.register_user(
+               valid_registration_attrs(%{
+                 email: "marketing-missing-version@example.com",
+                 marketing_consent: true,
+                 marketing_consent_version: nil
+               })
+             )
+
+    assert {:ok, _user} =
+             Accounts.register_user(
+               valid_registration_attrs(%{
+                 email: "marketing-with-version@example.com",
+                 marketing_consent: true,
+                 marketing_consent_version: "v1"
+               })
+             )
+  end
+
+  test "granted_at_is_set_at_execution_time" do
+    {:ok, user} =
+      Accounts.register_user(valid_registration_attrs(%{email: "grant-time@example.com"}))
+
+    before = DateTime.utc_now()
+    assert {:ok, role} = Accounts.bootstrap_staff_admin(user.id)
+    after_ = DateTime.utc_now()
+
+    assert DateTime.compare(role.granted_at, before) in [:gt, :eq]
+    assert DateTime.compare(role.granted_at, after_) in [:lt, :eq]
   end
 end

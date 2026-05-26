@@ -22,7 +22,8 @@ defmodule VgApp.Repo.Migrations.Vs000bAccountsFoundation do
             name: "user_profiles_user_id_fkey",
             type: :uuid,
             prefix: "public"
-          ), null: false
+          ),
+          null: false
 
       add :first_name, :text, null: false
       add :last_name, :text, null: false
@@ -50,7 +51,8 @@ defmodule VgApp.Repo.Migrations.Vs000bAccountsFoundation do
             name: "consent_records_user_id_fkey",
             type: :uuid,
             prefix: "public"
-          ), null: false
+          ),
+          null: false
 
       add :consent_type, :text, null: false
       add :consent_version, :text, null: false
@@ -83,7 +85,8 @@ defmodule VgApp.Repo.Migrations.Vs000bAccountsFoundation do
             name: "account_roles_user_id_fkey",
             type: :uuid,
             prefix: "public"
-          ), null: false
+          ),
+          null: false
 
       add :role, :text, null: false
       add :state, :text, null: false, default: "active"

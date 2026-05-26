@@ -19,6 +19,12 @@ defmodule VgApp.Accounts.UserProfile do
   end
 
   policies do
+    policy action_type(:read) do
+      authorize_if {VgApp.Accounts.Checks.SystemActor, []}
+      authorize_if {VgApp.Accounts.Checks.StaffAdmin, []}
+      authorize_if expr(user_id == ^actor(:id))
+    end
+
     policy always() do
       authorize_if always()
     end

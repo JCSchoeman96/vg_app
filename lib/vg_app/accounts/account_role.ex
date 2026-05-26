@@ -8,6 +8,8 @@ defmodule VgApp.Accounts.AccountRole do
   postgres do
     table "account_roles"
     repo VgApp.Repo
+
+    identity_index_names unique_role_per_user: "account_roles_user_role_idx"
   end
 
   actions do
@@ -15,12 +17,12 @@ defmodule VgApp.Accounts.AccountRole do
 
     create :bootstrap_staff_admin do
       accept [:user_id, :role]
-      change set_attribute(:granted_at, DateTime.utc_now())
+      change {VgApp.Accounts.Changes.SetGrantedAtNow, []}
     end
 
     create :assign_role do
       accept [:user_id, :role, :granted_by_user_id]
-      change set_attribute(:granted_at, DateTime.utc_now())
+      change {VgApp.Accounts.Changes.SetGrantedAtNow, []}
     end
   end
 
@@ -85,6 +87,6 @@ defmodule VgApp.Accounts.AccountRole do
   end
 
   identities do
-    identity :unique_active_role_per_user, [:user_id, :role]
+    identity :unique_role_per_user, [:user_id, :role]
   end
 end

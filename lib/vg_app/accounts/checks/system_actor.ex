@@ -7,4 +7,3 @@ defmodule VgApp.Accounts.Checks.SystemActor do
   @impl true
   def match?(actor, _context, _opts), do: actor == :system
 end
-

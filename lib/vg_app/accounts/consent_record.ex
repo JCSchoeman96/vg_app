@@ -9,7 +9,8 @@ defmodule VgApp.Accounts.ConsentRecord do
     table "consent_records"
     repo VgApp.Repo
 
-    identity_index_names unique_active_consent_type_version_per_user: "consent_records_uact_per_user_idx"
+    identity_index_names unique_active_consent_type_version_per_user:
+                           "consent_records_uact_per_user_idx"
   end
 
   actions do
@@ -31,6 +32,12 @@ defmodule VgApp.Accounts.ConsentRecord do
   end
 
   policies do
+    policy action_type(:read) do
+      authorize_if {VgApp.Accounts.Checks.SystemActor, []}
+      authorize_if {VgApp.Accounts.Checks.StaffAdmin, []}
+      authorize_if expr(user_id == ^actor(:id))
+    end
+
     policy always() do
       authorize_if always()
     end
@@ -86,6 +93,10 @@ defmodule VgApp.Accounts.ConsentRecord do
   end
 
   identities do
-    identity :unique_active_consent_type_version_per_user, [:user_id, :consent_type, :consent_version]
+    identity :unique_active_consent_type_version_per_user, [
+      :user_id,
+      :consent_type,
+      :consent_version
+    ]
   end
 end
