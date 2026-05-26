@@ -5,4 +5,3 @@ defmodule VgApp.Memberships do
   resources do
   end
 end
-

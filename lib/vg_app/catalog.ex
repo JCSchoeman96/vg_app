@@ -5,4 +5,3 @@ defmodule VgApp.Catalog do
   resources do
   end
 end
-

@@ -5,4 +5,3 @@ defmodule VgApp.Commerce do
   resources do
   end
 end
-
