@@ -1,0 +1,206 @@
+{
+  "attributes": [
+    {
+      "allow_nil?": false,
+      "default": "fragment(\"uuid_generate_v7()\")",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": true,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "id",
+      "type": "uuid"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": {
+        "deferrable": false,
+        "destination_attribute": "id",
+        "destination_attribute_default": null,
+        "destination_attribute_generated": null,
+        "index?": false,
+        "match_type": null,
+        "match_with": null,
+        "multitenancy": {
+          "attribute": null,
+          "global": null,
+          "strategy": null
+        },
+        "name": "consent_records_user_id_fkey",
+        "on_delete": null,
+        "on_update": null,
+        "primary_key?": true,
+        "schema": "public",
+        "table": "users"
+      },
+      "scale": null,
+      "size": null,
+      "source": "user_id",
+      "type": "uuid"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "consent_type",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "consent_version",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "\"accepted\"",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "state",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "accepted_at",
+      "type": "utc_datetime_usec"
+    },
+    {
+      "allow_nil?": true,
+      "default": "nil",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "revoked_at",
+      "type": "utc_datetime_usec"
+    },
+    {
+      "allow_nil?": false,
+      "default": "nil",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "source",
+      "type": "text"
+    },
+    {
+      "allow_nil?": true,
+      "default": "nil",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "ip_address_hash",
+      "type": "text"
+    },
+    {
+      "allow_nil?": true,
+      "default": "nil",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "user_agent_hash",
+      "type": "text"
+    },
+    {
+      "allow_nil?": false,
+      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "inserted_at",
+      "type": "utc_datetime_usec"
+    },
+    {
+      "allow_nil?": false,
+      "default": "fragment(\"(now() AT TIME ZONE 'utc')\")",
+      "generated?": false,
+      "precision": null,
+      "primary_key?": false,
+      "references": null,
+      "scale": null,
+      "size": null,
+      "source": "updated_at",
+      "type": "utc_datetime_usec"
+    }
+  ],
+  "base_filter": null,
+  "check_constraints": [],
+  "create_table_options": null,
+  "custom_indexes": [],
+  "custom_statements": [],
+  "has_create_action": true,
+  "hash": "972816FBDF2799C0E7527DAB8CD925BBFDFF81436D75A98B836434FEBCC8351F",
+  "identities": [
+    {
+      "all_tenants?": false,
+      "base_filter": null,
+      "index_name": "consent_records_uact_per_user_idx",
+      "keys": [
+        {
+          "type": "atom",
+          "value": "user_id"
+        },
+        {
+          "type": "atom",
+          "value": "consent_type"
+        },
+        {
+          "type": "atom",
+          "value": "consent_version"
+        }
+      ],
+      "name": "unique_active_consent_type_version_per_user",
+      "nils_distinct?": true,
+      "where": null
+    }
+  ],
+  "multitenancy": {
+    "attribute": null,
+    "global": null,
+    "strategy": null
+  },
+  "repo": "Elixir.VgApp.Repo",
+  "schema": null,
+  "table": "consent_records"
+}
