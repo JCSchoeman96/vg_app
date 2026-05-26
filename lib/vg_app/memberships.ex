@@ -1,0 +1,8 @@
+defmodule VgApp.Memberships do
+  use Ash.Domain,
+    otp_app: :vg_app
+
+  resources do
+  end
+end
+
