@@ -5,7 +5,7 @@ defmodule VgApp.MixProject do
     [
       app: :vg_app,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -43,6 +43,10 @@ defmodule VgApp.MixProject do
     [
       {:bcrypt_elixir, "~> 3.0"},
       {:picosat_elixir, "~> 0.2"},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.14", only: [:dev, :test], runtime: false},
       {:sourceror, "~> 1.8", only: [:dev, :test]},
       {:usage_rules, "~> 1.0", only: [:dev]},
       {:oban, "~> 2.0"},
