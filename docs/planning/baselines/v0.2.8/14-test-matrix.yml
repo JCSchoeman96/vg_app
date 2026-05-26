@@ -1,0 +1,174 @@
+version: 0.2.8
+global_required_tests:
+- access_evaluation_does_not_mutate_state
+- amount_mismatch_blocks_order_paid
+- archived_benefit_rule_does_not_create_grants
+- archived_membership_product_cannot_be_purchased
+- archived_plan_cannot_be_purchased
+- auto_renewing_plan_cannot_go_live_without_recurring_capability
+- backend_tracer_proves_full_membership_commerce_spine
+- benefit_rule_can_activate_for_draft_or_active_plan
+- benefit_rule_creates_expected_grants
+- benefit_rule_type_is_required
+- blocks_second_active_membership_per_product
+- callback_verify_success_can_provisionally_fulfil_order
+- cancelled_membership_blocks_access
+- confirmed_user_can_create_order
+- contradictory_event_moves_payment_membership_and_grants_to_review
+- creates_membership_product_with_unique_code
+- creates_monthly_yearly_and_lifetime_plans
+- creates_pending_membership_without_access
+- discount_benefit_does_not_calculate_discount
+- does_not_create_membership
+- duplicate_fulfilment_does_not_duplicate_membership_or_grants
+- duplicate_payment_event_does_not_create_second_row
+- duplicate_plan_code_rejected
+- duplicate_success_event_does_not_duplicate_success_effects
+- expire_due_memberships_marks_expired
+- expired_grant_blocks_access
+- failed_payment_does_not_activate_membership
+- fixed_period_membership_sets_expires_at
+- grant_validity_matches_membership_validity
+- invalid_confirmation_token_rejected
+- invalid_paystack_signature_rejected
+- lifetime_membership_has_no_expiry
+- login_requires_valid_credentials
+- mark_order_paid_does_not_activate_membership
+- mark_order_paid_does_not_create_grants
+- marketing_consent_optional_and_separate
+- membership_snapshots_duration_terms
+- minimal_pages_do_not_create_business_truth
+- no_forbidden_scope_dependencies
+- offer_remains_membership_only
+- offer_requires_active_plan_and_price
+- password_reset_request_does_not_reveal_account_existence
+- password_reset_token_can_reset_password
+- payment_method_does_not_create_subscription
+- payment_review_grant_blocks_access
+- payment_review_membership_blocks_access
+- paystack_callback_does_not_activate_membership
+- paystack_callback_does_not_activate_membership_without_verify_success
+- paystack_callback_shows_pending_only
+- paystack_charge_success_event_marks_order_paid_only_once
+- planning_pack_validator_passes
+- raw_paystack_payload_is_restricted_and_hashed
+- recurring_ready_does_not_create_subscription
+- registers_user_with_required_profile_and_consents
+- reject_duplicate_rule_code_per_product_or_plan
+- rejects_duplicate_email
+- rejects_duplicate_membership_item_for_order
+- rejects_duplicate_membership_product_code
+- rejects_duplicate_offer_code
+- rejects_invalid_duration_configuration
+- rejects_second_active_price
+- snapshot_contains_amount_currency_price_and_duration_source
+- snapshot_does_not_mutate_price
+- staff_admin_role_required_for_admin_actions
+- stores_paystack_authorization_metadata_without_raw_card_data
+- subscription_resource_is_deferred_not_active
+- system_is_not_stored_as_user_role
+- terms_and_privacy_consent_required
+- unconfirmed_user_cannot_create_order
+- utc_microsecond_timestamps_are_platform_standard
+- uuidv7_ordering_is_secondary_only
+- uuidv7_primary_keys_are_platform_standard
+- verified_paystack_success_marks_payment_succeeded
+- verify_pending_does_not_fulfil
+- webhook_success_confirms_provisional_fulfilment
+test_groups:
+  accounts:
+  - confirmed_user_can_create_order
+  - invalid_confirmation_token_rejected
+  - login_requires_valid_credentials
+  - marketing_consent_optional_and_separate
+  - password_reset_request_does_not_reveal_account_existence
+  - password_reset_token_can_reset_password
+  - registers_user_with_required_profile_and_consents
+  - rejects_duplicate_email
+  - staff_admin_role_required_for_admin_actions
+  - system_is_not_stored_as_user_role
+  - terms_and_privacy_consent_required
+  - unconfirmed_user_cannot_create_order
+  membership:
+  - access_evaluation_does_not_mutate_state
+  - archived_benefit_rule_does_not_create_grants
+  - archived_membership_product_cannot_be_purchased
+  - auto_renewing_plan_cannot_go_live_without_recurring_capability
+  - backend_tracer_proves_full_membership_commerce_spine
+  - benefit_rule_can_activate_for_draft_or_active_plan
+  - benefit_rule_creates_expected_grants
+  - benefit_rule_type_is_required
+  - blocks_second_active_membership_per_product
+  - cancelled_membership_blocks_access
+  - creates_membership_product_with_unique_code
+  - creates_pending_membership_without_access
+  - discount_benefit_does_not_calculate_discount
+  - does_not_create_membership
+  - expire_due_memberships_marks_expired
+  - expired_grant_blocks_access
+  - failed_payment_does_not_activate_membership
+  - fixed_period_membership_sets_expires_at
+  - grant_validity_matches_membership_validity
+  - lifetime_membership_has_no_expiry
+  - mark_order_paid_does_not_activate_membership
+  - mark_order_paid_does_not_create_grants
+  - membership_snapshots_duration_terms
+  - offer_remains_membership_only
+  - paystack_callback_does_not_activate_membership
+  - rejects_duplicate_membership_item_for_order
+  - rejects_duplicate_membership_product_code
+  - rejects_invalid_duration_configuration
+  - snapshot_contains_amount_currency_price_and_duration_source
+  catalog:
+  - membership_snapshots_duration_terms
+  - offer_remains_membership_only
+  - offer_requires_active_plan_and_price
+  - rejects_duplicate_offer_code
+  - rejects_second_active_price
+  - snapshot_contains_amount_currency_price_and_duration_source
+  - snapshot_does_not_mutate_price
+  commerce:
+  - amount_mismatch_blocks_order_paid
+  - callback_verify_success_can_provisionally_fulfil_order
+  - confirmed_user_can_create_order
+  - contradictory_event_moves_payment_membership_and_grants_to_review
+  - duplicate_fulfilment_does_not_duplicate_membership_or_grants
+  - duplicate_payment_event_does_not_create_second_row
+  - duplicate_success_event_does_not_duplicate_success_effects
+  - failed_payment_does_not_activate_membership
+  - invalid_paystack_signature_rejected
+  - mark_order_paid_does_not_activate_membership
+  - mark_order_paid_does_not_create_grants
+  - payment_method_does_not_create_subscription
+  - payment_review_grant_blocks_access
+  - payment_review_membership_blocks_access
+  - paystack_callback_does_not_activate_membership
+  - paystack_callback_does_not_activate_membership_without_verify_success
+  - paystack_callback_shows_pending_only
+  - paystack_charge_success_event_marks_order_paid_only_once
+  - raw_paystack_payload_is_restricted_and_hashed
+  - recurring_ready_does_not_create_subscription
+  - rejects_duplicate_membership_item_for_order
+  - snapshot_contains_amount_currency_price_and_duration_source
+  - stores_paystack_authorization_metadata_without_raw_card_data
+  - subscription_resource_is_deferred_not_active
+  - unconfirmed_user_cannot_create_order
+  - utc_microsecond_timestamps_are_platform_standard
+  - uuidv7_ordering_is_secondary_only
+  - uuidv7_primary_keys_are_platform_standard
+  - verified_paystack_success_marks_payment_succeeded
+  - verify_pending_does_not_fulfil
+  - webhook_success_confirms_provisional_fulfilment
+
+  vs000:
+  - backend_tracer_proves_full_membership_commerce_spine
+  - fixed_period_membership_sets_expires_at
+  - callback_verify_success_can_provisionally_fulfil_order
+  - webhook_success_confirms_provisional_fulfilment
+  - duplicate_fulfilment_does_not_duplicate_membership_or_grants
+  - duplicate_success_event_does_not_duplicate_success_effects
+  - payment_review_grant_blocks_access
+  - payment_review_membership_blocks_access
+  - stores_paystack_authorization_metadata_without_raw_card_data
+  - auto_renewing_plan_cannot_go_live_without_recurring_capability
+  - access_evaluation_does_not_mutate_state

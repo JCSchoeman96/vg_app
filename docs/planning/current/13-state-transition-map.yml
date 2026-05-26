@@ -1,0 +1,108 @@
+version: 0.2.7
+platform_laws:
+- All primary IDs SHALL use UUIDv7.
+- All persisted timestamps SHALL use UTC microsecond precision.
+- UUIDv7 ordering MAY be used as secondary technical ordering only and SHALL NOT be authoritative business event ordering.
+resources:
+  MembershipPlan:
+    states:
+    - draft
+    - active
+    - archived
+    renewal_modes:
+    - fixed_term
+    - auto_renewing
+    public_sale_states:
+    - draft
+    - internal_test
+    - live
+    rules:
+    - auto_renewing SHALL NOT be live/sellable until recurring capability exists
+  Order:
+    states:
+    - pending_payment
+    - payment_processing
+    - paid
+    - fulfilled
+    - cancelled
+    - payment_review
+    transitions:
+    - create_pending_order -> pending_payment
+    - submit_order_for_payment -> payment_processing
+    - mark_order_paid -> paid
+    - fulfil_paid_order -> fulfilled
+    - move_payment_to_review -> payment_review
+  Payment:
+    states:
+    - initialized
+    - processing
+    - succeeded
+    - cancelled
+    - payment_review
+    fulfilment_authority_states:
+    - none
+    - provisional_verify_success
+    - webhook_confirmed
+    - payment_review
+    transitions:
+    - initialize_paystack_transaction -> initialized
+    - submit_order_for_payment -> processing
+    - verify_success_or_webhook_charge_success -> succeeded
+    - contradictory_event -> payment_review
+  PaymentEvent:
+    states:
+    - received
+    - processed
+    - ignored_or_unhandled
+    - errored
+    event_sources:
+    - paystack_webhook
+    - paystack_verify_api
+    - internal_system
+    transitions:
+    - ingest_paystack_webhook -> received
+    - verify_paystack_transaction -> received
+    - process_success -> processed
+    - duplicate_or_unsupported -> ignored_or_unhandled
+    - processing_error -> errored
+  PaymentMethod:
+    states:
+    - active
+    - disabled
+    transitions:
+    - record_payment_method -> active
+    - disable -> disabled (deferred)
+  Membership:
+    states:
+    - pending_payment
+    - active
+    - expired
+    - cancelled
+    - payment_review
+    transitions:
+    - create_pending_membership -> pending_payment
+    - fulfil_paid_order/activate_membership -> active
+    - expire_due_memberships -> expired
+    - contradictory_event -> payment_review
+  EntitlementGrant:
+    states:
+    - active
+    - expired
+    - revoked
+    - payment_review
+    transitions:
+    - create_entitlement_grants -> active
+    - expire_due_memberships -> expired
+    - contradictory_event -> payment_review
+    - revoke -> revoked (deferred)
+  Subscription:
+    states:
+    - deferred
+    rule: Deferred card only in v0.2.8; not implemented.
+global_rules:
+- Callback presence SHALL NOT deliver value.
+- Callback Verify success MAY provisionally fulfil only through Commerce.fulfil_paid_order.
+- Paystack webhook processing SHALL remain authoritative.
+- Contradictory Paystack status SHALL move Payment, Membership, and EntitlementGrant to payment_review where access is denied.
+- Callback Verify and webhook success SHALL use the same idempotent fulfilment action.
+- Auto-renewing plans SHALL NOT be live/sellable until recurring capability exists.
