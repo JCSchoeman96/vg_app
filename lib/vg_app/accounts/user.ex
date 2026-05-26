@@ -160,6 +160,8 @@ defmodule VgApp.Accounts.User do
       # Sets the email from the argument
       change set_attribute(:email, arg(:email))
 
+      change set_attribute(:state, :pending_confirmation)
+
       # Hashes the provided password
       change AshAuthentication.Strategy.Password.HashPasswordChange
 
@@ -228,10 +230,14 @@ defmodule VgApp.Accounts.User do
     bypass AshAuthentication.Checks.AshAuthenticationInteraction do
       authorize_if always()
     end
+
+    policy action(:register_with_password) do
+      authorize_if always()
+    end
   end
 
   attributes do
-    uuid_primary_key :id
+    uuid_v7_primary_key :id
 
     attribute :email, :ci_string do
       allow_nil? false
@@ -244,6 +250,26 @@ defmodule VgApp.Accounts.User do
     end
 
     attribute :confirmed_at, :utc_datetime_usec
+
+    attribute :state, :atom do
+      allow_nil? false
+      default :pending_confirmation
+      constraints one_of: [:pending_confirmation, :active, :suspended]
+    end
+  end
+
+  relationships do
+    has_one :user_profile, VgApp.Accounts.UserProfile do
+      destination_attribute :user_id
+    end
+
+    has_many :consent_records, VgApp.Accounts.ConsentRecord do
+      destination_attribute :user_id
+    end
+
+    has_many :account_roles, VgApp.Accounts.AccountRole do
+      destination_attribute :user_id
+    end
   end
 
   identities do
