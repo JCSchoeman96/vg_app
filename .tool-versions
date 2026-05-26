@@ -1,4 +1,4 @@
-erlang 27.2
-elixir 1.18.2-otp-27
+erlang 28.1.1
+elixir 1.19.5-otp-28
 nodejs 22.13.1
 ast-grep 0.35.0
