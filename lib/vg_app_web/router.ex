@@ -11,7 +11,13 @@ defmodule VgAppWeb.Router do
     plug :fetch_live_flash
     plug :put_root_layout, html: {VgAppWeb.Layouts, :root}
     plug :protect_from_forgery
-    plug :put_secure_browser_headers
+
+    plug :put_secure_browser_headers, %{
+      "content-security-policy" =>
+        "default-src 'self'; connect-src 'self' ws: wss:; img-src 'self' data:; " <>
+          "script-src 'self'; style-src 'self' 'unsafe-inline'"
+    }
+
     plug :load_from_session
   end
 
