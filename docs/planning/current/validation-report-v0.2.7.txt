@@ -1,0 +1,42 @@
+PASS: PV-001 planning-pack.yml exists
+PASS: PV-001B planning-pack.yml parses
+PASS: PV-002 all YAML fences parse
+PASS: PV-003 all planning-pack resources have resource cards
+PASS: PV-004 all planning-pack slices exist
+PASS: PV-005 all slice resources have cards
+PASS: PV-006 all slice actions have cards
+PASS: PV-007 no active slice uses forbidden scope refs
+PASS: PV-008 all active resource actions have action cards
+PASS: PV-009 all card tests appear in matrix
+PASS: PV-010 no MyApp placeholders
+PASS: PV-011 Store_Blueprint decision file exists
+PASS: PV-012 all resources have field_schema
+PASS: PV-013 all fields have name/type/required/nullable
+PASS: PV-014 all actions have contract shape
+PASS: PV-015 action actors match permission matrix
+PASS: PV-016 User has AshAuthentication password/confirmation fields
+PASS: PV-017 ConsentRecord exists and marketing consent is separate
+PASS: PV-018 AccountRole exists and system is not stored as role
+PASS: PV-019 MembershipProduct exists and is not generic catalog
+PASS: PV-020 MembershipPlan supports fixed period and lifetime terms
+PASS: PV-021 Membership snapshots duration and expiry
+PASS: PV-022 EntitlementGrant has validity dates
+PASS: PV-023 PaymentEvent owns Paystack idempotency and signature
+PASS: PV-024 Paystack callback presence never delivers value
+PASS: PV-025 recurring_ready metadata does not implement recurring billing
+PASS: PV-026 VS-002C uses one idempotent fulfilment pipeline
+PASS: PV-027 VS-002D activation and grants are atomic
+PASS: PV-028 Access evaluation checks state and dates
+PASS: PV-029 One active membership per user per product invariant exists
+PASS: PV-030 Discount calculation is deferred
+PASS: PV-031 UUIDv7 primary key law exists
+PASS: PV-032 UTC microsecond timestamp law exists
+PASS: PV-033 PaymentMethod exists as active resource
+PASS: PV-034 Subscription exists only as deferred resource card
+PASS: PV-035 auto_renewing is modelled but gated
+PASS: PV-036 Payment has fulfilment authority and review state
+PASS: PV-037 PaymentEvent stores restricted raw payload and event source
+PASS: PV-038 Callback Verify and webhook use same fulfilment action
+PASS: PV-039 payment_review blocks membership and grant access
+PASS: PV-040 PaymentMethod does not store raw card data
+EXIT_CODE=0

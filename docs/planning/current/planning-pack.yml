@@ -1,0 +1,140 @@
+pack_id: voelgoed-ash-agent-pack
+version: 0.2.8
+status: planning
+scope: vs000_coding_ready_backend_membership_commerce_tracer
+planning_status: READY_FOR_REVIEW_CLEAN
+coding_status: VS_000_READY_FOR_CODING_ONLY
+validator_status: PASSED
+display_name: VG App
+github_repo: vg_app
+root_module: VGApp
+otp_app: :vg_app
+repo_module: VGApp.Repo
+web_module: VGAppWeb
+endpoint_module: VGAppWeb.Endpoint
+main_lib_path: lib/vg_app
+web_lib_path: lib/vg_app_web
+store_blueprint:
+  authority: reference_extraction_source_only
+  decision_file: references/STORE_BLUEPRINT_EXTRACTION_DECISION_V1.md
+  copy_rule: KEEP_RENAME_REWRITE_REJECT_required_before_module_copy
+first_configured_membership_product:
+  code: vriendinneklub
+  name: Vriendinneklub
+gateway_first_target: Paystack
+resources:
+- User
+- UserProfile
+- ConsentRecord
+- AccountRole
+- MembershipProduct
+- MembershipPlan
+- Membership
+- BenefitRule
+- EntitlementGrant
+- Offer
+- Price
+- Order
+- OrderItem
+- Payment
+- PaymentMethod
+- PaymentEvent
+slices:
+- VS-000
+- VS-001A
+- VS-001B
+- VS-002A
+- VS-002B
+- VS-002C
+- VS-002D
+- VS-002E
+- VS-002F
+- VS-003A
+readiness:
+  VS-000: READY_FOR_CODING
+  VS-001A: NOT_READY
+  VS-001B: NOT_READY
+  VS-002A: NOT_READY
+  VS-002B: NOT_READY
+  VS-002C: NOT_READY
+  VS-002D: NOT_READY
+  VS-002E: NOT_READY
+  VS-002F: NOT_READY
+  VS-003A: NOT_READY
+implementation_gate:
+  ready_for_coding_requires:
+  - executable_planning_validator_passes
+  - slice_readiness_grill_passes
+  - all_resource_cards_have_field_schema
+  - all_action_cards_have_contract_shape
+  - action_actor_matches_permission_matrix
+  - ash_authentication_boundaries_explicit
+  - email_confirmation_required_before_purchase
+  - membership_product_not_generic_catalog
+  - paystack_callback_never_delivers_value
+  - webhook_processing_idempotent
+  - recurring_ready_does_not_implement_recurring_billing
+  - vs002d_activation_and_grants_atomic
+  - uuidv7_primary_keys_locked
+  - utc_microsecond_timestamps_locked
+  - payment_method_resource_active
+  - subscription_resource_deferred
+  - callback_and_webhook_use_same_fulfilment_action
+  - payment_review_blocks_access
+  - auto_renewing_plan_not_live_until_recurring_capability
+  - only_vs000_ready_for_coding
+  - vs000_uses_fake_paystack_adapter_in_automated_tests
+  - vs000_manual_paystack_smoke_optional_not_ci_required
+  - vs000_no_ui_no_live_paystack_required_no_subscription_engine
+semantic_hardening:
+  ash_authentication_required: true
+  consent_records_required: true
+  real_staff_admin_role_required: true
+  membership_product_foundation_required: true
+  one_active_membership_per_user_per_membership_product: true
+  paystack_webhook_idempotency_required: true
+  callback_read_only_pending_or_verifying: true
+  automatic_recurring_billing_deferred: true
+  discount_calculation_deferred: true
+  uuidv7_primary_keys_required: true
+  utc_microsecond_timestamps_required: true
+  uuidv7_ordering_secondary_only: true
+  payment_method_resource_required: true
+  subscription_resource_deferred: true
+  paystack_verify_may_provisionally_fulfil: true
+  paystack_webhook_authoritative: true
+  payment_review_blocks_access: true
+  auto_renewing_modelled_not_sellable_without_recurring_capability: true
+  vs000_ready_for_coding_only: true
+  vs000_real_backend_foundation: true
+  vs000_fake_paystack_adapter_required_for_automated_tests: true
+  vs000_manual_paystack_smoke_optional: true
+forbidden_scope_v0_2_8:
+- Events
+- Learning
+- Competitions
+- Media implementation
+- Community implementation
+- Shipping
+- Tax
+- FulfilmentDispatch
+- AuditEvent
+- GenericCatalog
+- ProductVariants
+- Inventory
+- CartFirstCheckout
+- FullRefunds
+- Bundles
+- CouponStacking
+- OrganiserPortal
+- DigitalDownloads
+- AutomaticRecurringBilling
+- RenewalInvoices
+- FailedRenewalRecovery
+- Dunning
+- UpgradeDowngrade
+- Proration
+- CancellationSelfService
+- DiscountCalculation
+- PaystackSubscriptionLifecycle
+- LiveAutoRenewingPlanSales

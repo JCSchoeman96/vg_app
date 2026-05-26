@@ -61,7 +61,7 @@ config :spark,
 config :vg_app,
   ecto_repos: [VgApp.Repo],
   generators: [timestamp_type: :utc_datetime],
-  ash_domains: [VgApp.Accounts]
+  ash_domains: [VgApp.Accounts, VgApp.Memberships, VgApp.Catalog, VgApp.Commerce]
 
 # Configure the endpoint
 config :vg_app, VgAppWeb.Endpoint,
